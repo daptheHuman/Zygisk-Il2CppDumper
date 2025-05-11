@@ -5,13 +5,16 @@ on:
         package_name:
           description: "Package name of the game:"
           required: true
+        libname:
+          description: "Name of the game lib:"
+          required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-java@v3
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 # v3.11.0
       with:
         distribution: temurin
         java-version: 11
@@ -20,6 +23,7 @@ jobs:
         chmod +x ./gradlew
         sed -i 's/moduleDescription = "/moduleDescription = "(${{ github.event.inputs.package_name }}) /g' module.gradle
         sed -i "s/com.game.packagename/${{ github.event.inputs.package_name }}/g" module/src/main/cpp/game.h
+        sed -i 's/#define LibName "libil2cpp.so"/#define LibName "${{ github.event.inputs.libname }}.so"/g' module/src/main/cpp/game.h
         ./gradlew :module:assembleRelease
     - uses: actions/upload-artifact@v3
       with:
